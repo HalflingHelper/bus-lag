@@ -58,20 +58,19 @@ fastify.get("/", async (request, reply) => {
   */
   let params = request.query.raw ? {} : { seo: seo };
 
-  // Get the available choices from the database
-  const options = await db.getOptions();
-  if (options) {
-    params.optionNames = options.map((choice) => choice.language);
-    params.optionCounts = options.map((choice) => choice.picks);
+
+  const flop = await db.getFlop();
+
+  // console.log(flop)
+  const teams = await db.getTeams();
+
+  if (flop) {
+    params.flop = flop
   }
-  // Let the user know if there was a db error
-  else params.error = data.errorMessage;
 
-  // Check in case the data is empty or not setup yet
-  if (options && params.optionNames.length < 1)
-    params.setup = data.setupMessage;
-
-  // ADD PARAMS FROM TODO HERE
+  if (teams) {
+    params.teams = teams
+  }
 
   // Send the page options or raw JSON data if the client requested it
   return request.query.raw
@@ -79,37 +78,30 @@ fastify.get("/", async (request, reply) => {
     : reply.view("/src/pages/index.hbs", params);
 });
 
-/**
- * Post route to process user vote
- *
- * Retrieve vote from body data
- * Send vote to database helper
- * Return updated list of votes
- */
-fastify.post("/", async (request, reply) => {
-  // We only send seo if the client is requesting the front-end ui
+fastify.post("/complete", async (request, reply) => {
+
   let params = request.query.raw ? {} : { seo: seo };
 
-  // Flag to indicate we want to show the poll results instead of the poll form
-  params.results = true;
-  let options;
+  // Remove the selected challenge from the flop
+  // TODO: To where?
 
-  // We have a vote - send to the db helper to process and return results
-  if (request.body.language) {
-    options = await db.processVote(request.body.language);
-    if (options) {
-      // We send the choices and numbers in parallel arrays
-      params.optionNames = options.map((choice) => choice.language);
-      params.optionCounts = options.map((choice) => choice.picks);
-    }
+  if (request.body.challenge) {
+    // The index is the index in the flop?
+    new_flop = await db.updateFlop(request.body.challenge, request.body.team)
   }
-  params.error = options ? null : data.errorMessage;
 
-  // Return the info to the client
-  return request.query.raw
-    ? reply.send(params)
-    : reply.view("/src/pages/index.hbs", params);
-});
+  return reply.redirect("/")
+})
+
+fastify.post("/spend", async (request, reply) => {
+  console.log(request.query)
+
+  // TODO: Some sort of notification?
+  db.spendChallenge(request.query.v)
+
+  return reply.redirect("/")
+})
+
 
 /**
  * Admin endpoint returns log of votes
@@ -176,7 +168,8 @@ fastify.post("/reset", async (request, reply) => {
 
 // Run the server and report out to the logs
 fastify.listen(
-  { port: process.env.PORT, host: "0.0.0.0" },
+  // { port: process.env.PORT, host: "0.0.0.0" },
+  { port: 3000, host: "0.0.0.0" },
   function (err, address) {
     if (err) {
       console.error(err);
