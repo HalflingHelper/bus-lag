@@ -8,29 +8,19 @@
 const fs = require("fs");
 
 // Initialize the database
-const dbFile = "./.data/choices.db";
+const dbFile = "./.data/yay.db";
 const exists = fs.existsSync(dbFile);
 const sqlite3 = require("sqlite3").verbose();
 const dbWrapper = require("sqlite");
 let db;
 
+
 /* 
 We're using the sqlite wrapper so that we can make async / await connections
 - https://www.npmjs.com/package/sqlite
 */
-dbWrapper
-  .open({
-    filename: dbFile,
-    driver: sqlite3.Database
-  })
-  .then(async dBase => {
-    db = dBase;
-
-    // We use try and catch blocks throughout to handle any database errors
-    try {
-      // The async / await syntax lets us write the db operations in a way that won't block the app
-      if (!exists) {
-        await db.run(
+async function loadInitData(db) {
+  await db.run(
           "CREATE TABLE Challenges (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, reward TEXT, complete INTEGER DEFAULT 0, spent INTEGER DEFAULT 0)"
         )
 
@@ -73,6 +63,22 @@ dbWrapper
         await db.run(
           "CREATE TABLE Log (id INTEGER PRIMARY KEY AUTOINCREMENT, action TEXT, time STRING)"
         )
+}
+
+
+dbWrapper
+  .open({
+    filename: dbFile,
+    driver: sqlite3.Database
+  })
+  .then(async dBase => {
+    db = dBase;
+
+    // We use try and catch blocks throughout to handle any database errors
+    try {
+      // The async / await syntax lets us write the db operations in a way that won't block the app
+      if (!exists) {
+        await loadInitData(db);
       } else {
         // We have a database already - write Choices records to log for info
         // console.log(await db.all("SELECT * from Choices"));
@@ -85,10 +91,25 @@ dbWrapper
     }
   });
 
+
 // Our server script will call these methods to connect to the db
 module.exports = {
 
   // TODO: Add logging (trivial)
+  resetChallenges : async () => {
+    console.log("RESET")
+    
+    await db.run("DROP TABLE Challenges")
+    await db.run("DROP TABLE Teams")
+    await db.run("DROP TABLE Flop")
+    await db.run("DROP TABLE TeamTickets")
+    await db.run("DROP TABLE Log")
+    
+    await loadInitData(db);
+    
+    
+  },
+  
   spendChallenge: async (challenge_id) => {
     try {
       await db.run(
@@ -103,11 +124,11 @@ module.exports = {
 
   getTeams: async () => {
     try {
-      teams = await db.all(
+      let teams = await db.all(
         `SELECT Teams.id, Teams.name FROM Teams`
       )
 
-      challenges = await db.all(
+      let challenges = await db.all(
         `SELECT TeamTickets.team_id, Challenges.id, Challenges.reward
         FROM TeamTickets 
           INNER JOIN Challenges on TeamTickets.challenge_id = Challenges.id
@@ -139,7 +160,7 @@ module.exports = {
 
   updateFlop: async (flop_id, dest) => {
     try {
-      challenge_id = await db.all(`SELECT (challenge_id) FROM Flop WHERE id=${flop_id}`)
+      let challenge_id = await db.all(`SELECT (challenge_id) FROM Flop WHERE id=${flop_id}`)
 
       // console.log(challenge_id)
 
@@ -167,7 +188,7 @@ module.exports = {
 
       // Mark the challenge as gone
 
-      new_c = await db.all(`SELECT (id) FROM Challenges WHERE complete=0 ORDER BY RANDOM() LIMIT 1`)
+      let new_c = await db.all(`SELECT (id) FROM Challenges WHERE complete=0 ORDER BY RANDOM() LIMIT 1`)
 
       if (new_c && new_c.length > 0) {
         await db.run(
