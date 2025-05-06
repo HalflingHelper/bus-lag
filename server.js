@@ -150,13 +150,17 @@ fastify.post("/reset", async (request, reply) => {
 
     // Get the log list
     params.optionHistory = await db.getLogs();
-  } else {
-    // We have a valid key and can clear the log
-    params.optionHistory = await db.clearHistory();
-
-    // Check for errors - method would return false value
-    params.error = params.optionHistory ? null : data.errorMessage;
+  } 
+  else {
+    db.resetChallenges()
   }
+//   else {
+//     // We have a valid key and can clear the log
+//     params.optionHistory = await db.clearHistory();
+
+//     // Check for errors - method would return false value
+//     params.error = params.optionHistory ? null : data.errorMessage;
+//   }
 
   // Send a 401 if auth failed, 200 otherwise
   const status = params.failed ? 401 : 200;
