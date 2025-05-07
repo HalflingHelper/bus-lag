@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=ADLaM+Display&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Challenges -->
+    <div class="h-scroll">
+        <div class="chal-card" id="first-one">
+            <h2 class="header">Read aloud an entire picture book at a library.</h2>
+            <p class="body">Draw pictures of jet lag, a frisbee, a newspaper. For each image have a different stranger
+                guess what you drew (1 stranger per image). You may not talk to the stranger at all. You may not use
+                your phone.</p>
+            <div class="reward v-ticket-divet">
+                <h3 class="pill">
+                    Ticket
+                </h3>
+                <p>Take an Uber west for 1 mile</p>
+            </div>
+        </div>
+        <div class="chal-card" id="second-one">
+            <h2 class="header">Read aloud an entire picture book at a library.</h2>
+            <p class="body">Draw pictures of jet lag, a frisbee, a newspaper. For each image have a different stranger
+                guess what you drew (1 stranger per image). You may not talk to the stranger at all. You may not use
+                your phone.</p>
+            <div class="reward v-ticket-divet">
+                <h3 class="pill">
+                    Ticket
+                </h3>
+                <p>Take an Uber west for 1 mile</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Claim Sheet -->
+
+    <div class="popover-sheet" id="claim-sheet" popover>
+        <div class="popover-header">
+            <h1>Select Team</h1>
+            <button class="close-button" popovertarget="claim-sheet" popovertargetaction="claim">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">
+                    <path d="M11 1.5L1 11.5M1 1.5L11 11.5" stroke="#D9D9D9" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+        <div class="popover-content">
+            <form method="post" action="complete" onsubmit="return confirm('Do you really want to submit the form?');">
+              <input id="challengeIdField" name="challengeId" type="hidden" value="">
+              
+            <button class="btn btn-accent btn-full">
+                <div class="avatar-container">
+                    <img src="https://avatars.githubusercontent.com/u/60663079?v=4" alt="Calvin Smiles">
+                    <p>Matéi & Ronak</p>
+                    <img src="https://avatars.githubusercontent.com/u/83771014?v=4" alt="Reece Smailes">
+                </div>
+            </button>
+
+
+            <button class="btn btn-accent btn-full">
+                <div class="avatar-container">
+                    <img src="https://avatars.githubusercontent.com/u/60663079?v=4" alt="Calvin Smiles">
+                    <p>Addie & Hanna</p>
+                    <img src="https://avatars.githubusercontent.com/u/83771014?v=4" alt="Reece Smailes">
+                </div>
+            </button>
+
+            <button class="btn btn-accent btn-full">
+                <div class="avatar-container">
+                    <img src="https://avatars.githubusercontent.com/u/60663079?v=4" alt="Calvin Smiles">
+                    <p>Dane & Flynn</p>
+                    <img src="https://avatars.githubusercontent.com/u/83771014?v=4" alt="Reece Smailes">
+                </div>
+            </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Use Ticket Sheet -->
+    <div class="popover-sheet" id="ticket-sheet" popover>
+        <div class="popover-header">
+            <h1>Tickets</h1>
+            <button class="close-button" popovertarget="ticket-sheet" popovertargetaction="hide">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">
+                    <path d="M11 1.5L1 11.5M1 1.5L11 11.5" stroke="#D9D9D9" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+        <div class="popover-content">
+            <div class="btn btn-accent btn-full">
+                <h2>Calvin & Reece</h2>
+            </div>
+
+            <button class="ticket-use v-ticket-divet">
+                <p>Take an Uber west for 1 mile.</p>
+                <div class="pill">
+                    Use
+                </div>
+            </button>
+
+            <div class="ticket-empty">
+                <p>Empty Slot</p>
+            </div>
+
+            <div class="btn btn-accent btn-full">
+                <h2>Matéi & Ronak</h2>
+            </div>
+
+            <div class="btn btn-accent btn-full">
+                <h2>Addie & Hannah</h2>
+            </div>
+
+            <div class="btn btn-accent btn-full">
+                <h2>Dane & Flynn</h2>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Bottom button actions -->
+    <button id="claim-btn" class="btn btn-accent btn-full" popovertarget="claim-sheet" disabled>Claim!</button>
+    <button class="btn btn-secondary btn-full" popovertarget="ticket-sheet">Use Tickets</button>
+
+
+    <script>
+        const horizScrollEl = document.querySelector('.h-scroll');
+        const claimBtn = document.getElementById('claim-btn');
+
+        horizScrollEl.addEventListener("scrollsnapchanging", (event) => {
+            const previousPending = document.querySelector(".pending");
+            if (previousPending) {
+                previousPending.classList.remove("pending");
+            }
+            event.snapTargetInline.classList.add("pending");
+            claimBtn.setAttribute('disabled','');
+        });
+
+        horizScrollEl.addEventListener("scrollsnapchange", (event) => {
+            const currentlySnapped = document.querySelector(".select-section");
+            if (currentlySnapped) {
+                currentlySnapped.classList.remove("select-section");
+            }
+            event.snapTargetInline.classList.add("select-section");
+            claimBtn.removeAttribute('disabled');
+            let challengeId = document.querySelector(".select-section").id;
+            document.getElementById('challengeIdField').value = challengeId;
+        });
+        
+    </script>
+
+</body>
+
+</html>

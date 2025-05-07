@@ -1,0 +1,97 @@
+        {{!-- <div class="card">
+          <input required="required" type="radio" name="challenge" value="{{this.id}}" />
+          <h3>{{this.title}}</h3>
+          <p class="card-body">{{this.description}}</p>
+          <p class="card-reward">{{this.reward}}</p>
+        </div> --}}
+
+
+
+      <!-- This is the start of content for our page -->
+
+      {{!-- <h1>Bus Lag 🚌</h1>
+      {{#if error}}
+      <p class="error">
+        {{error}}
+      </p>
+      {{else}} --}}
+
+      {{!-- <form method="post" action="complete" onsubmit="return confirm('Do you really want to submit the form?');"> --}}
+
+        {{!-- <div class="flop cards">
+
+          {{!-- TODO: What if empty flop? Should be an empty box --}}
+
+          {{#each flop}}
+          <div class="card">
+            <input required="required" type="radio" id="{{this.id}}" name="challenge" value="{{this.id}}" />
+            <h3>{{this.title}}</h3>
+            <p class="card-body">{{this.description}}</p>
+            <p class="card-reward">{{this.reward}}</p>
+          </div>
+          {{/each}}
+        </div> --}}
+
+        {{!-- <select name="team" id="team">
+          <option value="-1">Veto</option>
+          {{#each teams}}
+          <option value="{{this.id}}">{{this.name}}</option>
+          {{/each}}
+        </select> --}}
+
+        {{!-- <button type="submit">Complete</button> --}}
+
+      {{!-- </form> --}}
+
+
+
+
+      <!-- Instructions on using this project -->
+      {{!-- <div class="instructions">
+        <h2>
+          Using this project
+        </h2>
+        <p>
+          This is the Glitch <strong>Hello {{seo.db}}</strong> project. You can use it to build your own app. Check out
+          README.md in the editor for more info and next steps you can take!
+        </p>
+      </div> --}}
+
+    
+  
+  <!-- The footer holds our remix button — you can use it for structure or cut it out ✂ -->
+  {{!-- <footer class="footer">
+    <div class="links"></div>
+    <a href="/">Home</a>
+    <span class="divider">|</span>
+    <a href="/logs">Admin</a>
+    <a class="btn--remix" target="_top" href="https://glitch.com/edit/#!/remix/glitch-hello-sqlite">
+      <img src="https://cdn.glitch.com/605e2a51-d45f-4d87-a285-9410ad350515%2FLogo_Color.svg?v=1618199565140" alt="" />
+      Remix on Glitch
+    </a>
+  </footer> --}}
+
+
+
+      /*
+    let a = document.querySelectorAll(".flop .card")
+
+    function checkBtn(i) {
+      a.forEach((card, j) => {
+        btn = card.querySelector("input")
+        if (btn) {
+          btn.checked = (j == i);
+
+        } else {
+          console.error("no button?")
+        }
+      })
+    }
+
+    a.forEach((card, i) => {
+      card.addEventListener('click', (e) => {
+        e.preventDefault();
+        checkBtn(i);
+      })
+    })
+    */
