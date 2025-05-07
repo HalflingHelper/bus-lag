@@ -43,7 +43,7 @@
 
     <div class="chal-card" id="{{this.id}}">
       <h2 class="header">{{this.title}}</h2>
-      <p class="body">{{this.description}}</p>
+      <p class="body">{{{this.description}}}</p>
       <div class="reward v-ticket-divet">
         <h3 class="pill">
           Ticket
@@ -160,7 +160,8 @@
 
 
   <!-- Bottom button actions -->
-  <button id="claim-btn" class="btn btn-accent btn-full" popovertarget="claim-sheet">Claim!</button>
+  <button id="claim-btn" class="btn btn-accent btn-full" popovertarget="claim-sheet"
+  onclick="{ getSelectedChallenge(); }">Claim!</button>
   <button class="btn btn-secondary btn-full" popovertarget="ticket-sheet">Use Tickets</button>
 
 
@@ -173,28 +174,43 @@
     const horizScrollEl = document.querySelector('.h-scroll');
     const claimBtn = document.getElementById('claim-btn');
 
-    horizScrollEl.addEventListener("scrollsnapchanging", (event) => {
-      /* Actively scrolling, selection changing */
-      const previousPending = document.querySelector(".pending");
-      if (previousPending) {
-        previousPending.classList.remove("pending");
-      }
-      event.snapTargetInline.classList.add("pending");
-      claimBtn.setAttribute('disabled', '');
-    });
+    function getSelectedChallenge() {
+      let chals = document.getElementsByClassName("chal-card")
 
-    horizScrollEl.addEventListener("scrollsnapchange", (event) => {
-      /* Scrolling stopped, selection set */
-      const currentlySnapped = document.querySelector(".select-section");
-      if (currentlySnapped) {
-        currentlySnapped.classList.remove("select-section");
+      for (let i = 0; i != chals.length; ++i) {
+        let r= chals[i].getBoundingClientRect()
+
+        if (r.x > 0 && r.x < 100) {
+          console.log(i)
+          document.getElementById('challengeIdField').value = chals[i].id;
+
+        } 
       }
-      event.snapTargetInline.classList.add("select-section");
-      claimBtn.removeAttribute('disabled');
-      let challengeId = document.querySelector(".select-section").id;
-      console.log("Change challenge")
-      document.getElementById('challengeIdField').value = challengeId;
-    });
+
+    }
+
+//    horizScrollEl.addEventListener("scrollsnapchanging", (event) => {
+//      /* Actively scrolling, selection changing */
+//      const previousPending = document.querySelector(".pending");
+//      if (previousPending) {
+//        previousPending.classList.remove("pending");
+//      }
+//      event.snapTargetInline.classList.add("pending");
+//      claimBtn.setAttribute('disabled', '');
+//    });
+//
+//    horizScrollEl.addEventListener("scrollsnapchange", (event) => {
+//      /* Scrolling stopped, selection set */
+//      const currentlySnapped = document.querySelector(".select-section");
+//      if (currentlySnapped) {
+//        currentlySnapped.classList.remove("select-section");
+//      }
+//      event.snapTargetInline.classList.add("select-section");
+//      claimBtn.removeAttribute('disabled');
+//      let challengeId = document.querySelector(".select-section").id;
+//      console.log("Change challenge")
+//      document.getElementById('challengeIdField').value = challengeId;
+//    });
 
   </script>
 </body>
