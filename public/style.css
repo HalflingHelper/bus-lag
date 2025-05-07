@@ -215,16 +215,23 @@ p.error a:visited {
 }
 
 .cards {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
+
+  overflow: scroll;
 
   .card {
     background-color: white;
-    padding: 2px;
+    padding: 10px;
     width: 200px;
     height: 250px; 
+    margin: 6px;
+    margin-bottom: 12px; /* A little extra for scroll bar */
+
+    input[type="radio"] {
+      display:none;
+    }
 
     h3 {
       font-size: 20px;
@@ -239,6 +246,17 @@ p.error a:visited {
       font-size: 12px;
       color: grey;
     }
+  }
+
+  .card:has(input[type="radio"]:checked) {
+    outline: 6px solid var(--color-accent);
+    background-color: red;
+  }
+
+
+  .blank {
+    background-color: transparent;
+    border: 6px dashed var(--color-accent);
   }
 
 }

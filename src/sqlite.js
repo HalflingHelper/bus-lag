@@ -48,7 +48,7 @@ async function loadInitData(db) {
 
 
         await db.run(
-          "CREATE TABLE TeamTickets (id INTEGER PRIMARY KEY AUTOINCREMENT, team_id INTEGER, challenge_id INTEGER, FOREIGN KEY (team_id) REFERENCES Teams(id), FOREIGN KEY (challenge_id) REFERENCES Challenges(id))"
+          "CREATE TABLE TeamTickets (id INTEGER PRIMARY KEY AUTOINCREMENT, team_id INTEGER, challenge_id INTEGER, status INTEGER DEFAULT 0, FOREIGN KEY (team_id) REFERENCES Teams(id), FOREIGN KEY (challenge_id) REFERENCES Challenges(id))"
         )
 
         await db.run(
@@ -95,6 +95,27 @@ dbWrapper
 // Our server script will call these methods to connect to the db
 module.exports = {
 
+  reshuffleChallenges : async () => {
+    console.log("RESHUFFLE");
+
+    await db.run(
+      "UPDATE Challenges SET spent=0, complete=0 WHERE complete=2 AND spent=1"
+    )
+
+    let flop_size = await db.run("SELECT COUNT(*) FROM Flop");
+
+    if (flop_size < 4) {
+      for (let i = 0; i != 4 - flop)
+    }
+
+    // Set all challenges that are complete 2 and spent 1
+    //  to completed 0 and spent 0
+    // Set all challenges that are spent to no spent
+
+    // Remove extraneous completed tickets
+  },
+
+
   // TODO: Add logging (trivial)
   resetChallenges : async () => {
     console.log("RESET")
@@ -106,14 +127,17 @@ module.exports = {
     await db.run("DROP TABLE Log")
     
     await loadInitData(db);
-    
-    
   },
   
   spendChallenge: async (challenge_id) => {
     try {
       await db.run(
         "UPDATE Challenges SET spent=1 WHERE id = ?",
+        challenge_id
+      )
+
+      await db.run(
+        "UPDATE TeamTickets SET old=1 WHERE challenge_id=?",
         challenge_id
       )
     } catch (dbError) {
@@ -132,18 +156,19 @@ module.exports = {
         `SELECT TeamTickets.team_id, Challenges.id, Challenges.reward
         FROM TeamTickets 
           INNER JOIN Challenges on TeamTickets.challenge_id = Challenges.id
-          WHERE (Challenges.complete=2 AND Challenges.spent=0)`
+          WHERE (Challenges.complete=2 AND Challenges.spent=0 AND TeamTickets.old=0)`
       )
-
-      console.log(await db.all("SELECT * FROM TeamTickets"))
 
       if (teams && challenges) {
         // I want the team id in both the be the same
-        return teams.map(t => { return { "id": t.id, "name": t.name, "challenges": challenges.filter(c => c.team_id == t.id)} })
+        teams = teams.map(t => { return { "id": t.id, "name": t.name, "challenges": challenges.filter(c => c.team_id == t.id)} })
 
-      } else {
-        return teams
+        teams.forEach(t => {
+          t.remaining = 3 - t.challenges.length
+        });
       }
+
+      return teams
     } catch (dbError) {
       console.error(dbError)
     }

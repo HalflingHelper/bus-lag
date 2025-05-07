@@ -59,13 +59,30 @@
       </p>
       {{/if}}
 
+      <form action="/shuffle" method="post">
+        <h2>Reshuffle</h2>
+        <p>
+          Return all non-held challenges to the deck for the flop.
+        </p>
+        <p>
+          Enter your admin key to confirm:
+        </p>
+
+        {{#if failed1}}
+          {{failed1}}
+        {{/if}}
+        <input type="password" id="pass1" name="key" required />
+        <button type="submit">Reshuffle</button>
+      </form>
+
+
       <!-- The user can clear the logs if they first set up an admin key in the env -->
       <form action="/reset" method="post">
         <h2>
-          Clear vote history
+          Reset Game
         </h2>
         <p>
-          Clear the history only if you are absolutely sure! It cannot be undone.
+          Clear the game only if you are absolutely sure! It cannot be undone.
           <em>(Check the README for instructions on setting up your admin key.)</em>
         </p>
         <p>
@@ -79,8 +96,10 @@
         </p>
         {{/if}}
         <input type="password" id="pass" name="key" required>
-        <button type="submit">Clear log history</button>
+        <button type="submit">Reset Game</button>
       </form>
+
+      
       {{/if}}
     </div>
   </div>

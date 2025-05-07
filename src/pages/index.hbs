@@ -40,8 +40,9 @@
         {{error}}
       </p>
       {{else}}
-      <form method="post" action="complete">
-        <div class="cards">
+      <form method="post" action="complete"
+      onsubmit="return confirm('Do you really want to submit the form?');">
+        <div class="flop cards">
 
           {{!-- TODO: What if empty flop? Should be an empty box --}}
 
@@ -70,16 +71,21 @@
       {{#each teams}}
       <h2>{{this.name}}</h2>
       {{!-- TODO: Template / Dotted lines --}}
-      <div class="cards">
+      <div class="team-cards cards">
         {{#each this.challenges}}
           <div class="card">
             {{this.reward}}
 
-            <form method="post" action="spend?v={{this.id}}">
+            <form method="post" action="spend?v={{this.id}}"
+            onsubmit="return confirm('Are you sure you want to use this ticket?');">
                         <button onclick="spend()">Use</button>
             </form>
           </div>
         {{/each}}
+
+        {{#repeat this.remaining}}
+          <div class="card blank"></div>
+        {{/repeat}}
       </div>
       {{/each}}
 
@@ -109,6 +115,29 @@
       Remix on Glitch
     </a>
   </footer>
+
+  <script>
+    let a = document.querySelectorAll(".flop .card")
+
+    function checkBtn(i) {
+      a.forEach((card, j) => {
+        btn = card.querySelector("input")
+        if (btn) {
+        btn.checked = (j == i);
+
+        } else {
+          console.error("no button?")
+        }
+      })
+    }
+
+    a.forEach((card, i) => {
+      card.addEventListener('click', (e) => {
+        e.preventDefault();
+        checkBtn(i);
+      })
+    })
+  </script>
 </body>
 
 </html>
