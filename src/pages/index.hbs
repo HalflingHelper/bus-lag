@@ -1,13 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-  <!-- 
-    This is the main Handlebars template for the site 
-    - When the user visits the homepage or submits a choice the app calls the endpoints in server.js
-    - The server script passes data in here and the Handlebars code builds it into the HTML page
-  -->
 
   <meta charset="utf-8" />
   <link rel="icon" href="https://glitch.com/favicon.ico" />
@@ -24,119 +17,167 @@
   <meta property="og:description" content="{{seo.description}}">
   <meta property="og:image" content="{{seo.image}}">
   <meta name="twitter:card" content="summary">
-
+  <meta name="theme-color" content="#183B4E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=ADLaM+Display&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <!-- Import the webpage's stylesheet -->
   <link rel="stylesheet" href="/style.css" />
 </head>
 
 <body>
-  <div class="wrapper">
-    <div class="content" role="main">
 
-      <!-- This is the start of content for our page -->
-      <h1>Bus Lag 🚌</h1>
       {{#if error}}
       <p class="error">
         {{error}}
       </p>
       {{else}}
-      <form method="post" action="complete"
-      onsubmit="return confirm('Do you really want to submit the form?');">
-        <div class="flop cards">
 
-          {{!-- TODO: What if empty flop? Should be an empty box --}}
+      <!-- Challenges -->
+      <div class="h-scroll">
 
-          {{#each flop}}
-          <div class="card">
-            <input required="required" type="radio" id="{{this.id}}" name="challenge" value="{{this.id}}" />
-            <h3>{{this.title}}</h3>
-            <p class="card-body">{{this.description}}</p>
-            <p class="card-reward">{{this.reward}}</p>
+        {{#each flop}}
+
+        <div class="chal-card" id="{{this.id}}">
+          <h2 class="header">{{this.title}}</h2>
+          <p class="body">{{this.description}}</p>
+          <div class="reward v-ticket-divet">
+            <h3 class="pill">
+              Ticket
+            </h3>
+            <p>{{this.reward}}</p>
           </div>
-          {{/each}}
         </div>
-
-        <select name="team" id="team">
-          <option value="-1">Veto</option>
-          {{#each teams}}
-          <option value="{{this.id}}">{{this.name}}</option>
-          {{/each}}
-        </select>
-
-        <button type="submit">Complete</button>
-
-      </form>
-
-
-      {{#each teams}}
-      <h2>{{this.name}}</h2>
-      {{!-- TODO: Template / Dotted lines --}}
-      <div class="team-cards cards">
-        {{#each this.challenges}}
-          <div class="card">
-            {{this.reward}}
-
-            <form method="post" action="spend?v={{this.id}}"
-            onsubmit="return confirm('Are you sure you want to use this ticket?');">
-                        <button onclick="spend()">Use</button>
-            </form>
-          </div>
         {{/each}}
 
-        {{#repeat this.remaining}}
-          <div class="card blank"></div>
-        {{/repeat}}
+
+        <div class="chal-card">
+          <h2 class="header">Read aloud an entire picture book at a library.</h2>
+          <p class="body">Draw pictures of jet lag, a frisbee, a newspaper. For each image have a different stranger
+            guess what you drew (1 stranger per image). You may not talk to the stranger at all. You may not use
+            your phone.</p>
+          <div class="reward v-ticket-divet">
+            <h3 class="pill">
+              Ticket
+            </h3>
+            <p>1 mile Uber in the west direction some extra words for longer ones i guess....</p>
+          </div>
+        </div>
       </div>
-      {{/each}}
+
+      <!-- Claim Sheet -->
+
+      <div class="popover-sheet" id="claim-sheet" popover>
+        <div class="popover-header">
+          <h1>Select Team</h1>
+          <button class="close-button" popovertarget="claim-sheet" popovertargetaction="claim">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">
+              <path d="M11 1.5L1 11.5M1 1.5L11 11.5" stroke="#D9D9D9" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="popover-content">
+          <form method="post" action="complete" onsubmit="return confirm('Do you really want to submit the form?');">
+            {{!-- This hidden field will store the challengeId whenever a card is changed --}}
+            <input id="challengeIdField" name="challengeId" type="hidden" value="">
+
+            {{#each teams}}
+            {{!-- in the POST, you should see the name of the button that submitted the form, which is also the teamId --}}
+            <button id="{{this.id}}" name="{{this.id}}" class="btn btn-accent btn-full">
+              <div class="avatar-container">
+                <img src="https://avatars.githubusercontent.com/u/60663079?v=4" alt="Calvin Smiles">
+                <p>{{this.name}}</p>
+                <img src="https://avatars.githubusercontent.com/u/83771014?v=4" alt="Reece Smailes">
+              </div>
+            </button>
+            {{/each}}
+          </form>
+        </div>
+      </div>
+
+
+      <!-- Use Ticket Sheet -->
+      <div class="popover-sheet" id="ticket-sheet" popover>
+        <div class="popover-header">
+          <h1>Tickets</h1>
+          <button class="close-button" popovertarget="ticket-sheet" popovertargetaction="hide">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">
+              <path d="M11 1.5L1 11.5M1 1.5L11 11.5" stroke="#D9D9D9" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="popover-content">
+          {{#each teams}}
+          <div class="btn btn-accent btn-full">
+            <h2>{{this.name}}</h2>
+          </div>
+
+          {{#each this.challenges}}
+          <form method="post" action="spend?v={{this.id}}"
+            onsubmit="return confirm('Are you sure you want to use this ticket?');">
+
+          {{!-- Not really sure what spend() is, but I kept it just in case you need it --}}
+            <button class="ticket-use v-ticket-divet" onclick="spend()">
+              <p>{{this.reward}}</p>
+              <div class="pill">
+                Use
+              </div>
+          </form>
+          </button>
+          {{/each}}
+
+          {{#repeat this.remaining}}
+            <div class="ticket-empty">
+                <p>Empty Slot</p>
+            </div>
+          {{/repeat}}
+
+
+          {{/each}}
+
+        </div>
+      </div>
+
+
+      <!-- Bottom button actions -->
+      <button id="claim-btn" class="btn btn-accent btn-full" popovertarget="claim-sheet">Claim!</button>
+      <button class="btn btn-secondary btn-full" popovertarget="ticket-sheet">Use Tickets</button>
+
 
       {{/if}}
 
-      <!-- Instructions on using this project -->
-      <div class="instructions">
-        <h2>
-          Using this project
-        </h2>
-        <p>
-          This is the Glitch <strong>Hello {{seo.db}}</strong> project. You can use it to build your own app. Check out
-          README.md in the editor for more info and next steps you can take!
-        </p>
-      </div>
-
-    </div>
-  </div>
-  <!-- The footer holds our remix button — you can use it for structure or cut it out ✂ -->
-  <footer class="footer">
-    <div class="links"></div>
-    <a href="/">Home</a>
-    <span class="divider">|</span>
-    <a href="/logs">Admin</a>
-    <a class="btn--remix" target="_top" href="https://glitch.com/edit/#!/remix/glitch-hello-sqlite">
-      <img src="https://cdn.glitch.com/605e2a51-d45f-4d87-a285-9410ad350515%2FLogo_Color.svg?v=1618199565140" alt="" />
-      Remix on Glitch
-    </a>
-  </footer>
 
   <script>
-    let a = document.querySelectorAll(".flop .card")
 
-    function checkBtn(i) {
-      a.forEach((card, j) => {
-        btn = card.querySelector("input")
-        if (btn) {
-        btn.checked = (j == i);
+    /* Horizontal Scroll Selector Logic */
+    const horizScrollEl = document.querySelector('.h-scroll');
+    const claimBtn = document.getElementById('claim-btn');
 
-        } else {
-          console.error("no button?")
+    horizScrollEl.addEventListener("scrollsnapchanging", (event) => {
+        /* Actively scrolling, selection changing */
+        const previousPending = document.querySelector(".pending");
+        if (previousPending) {
+            previousPending.classList.remove("pending");
         }
-      })
-    }
+        event.snapTargetInline.classList.add("pending");
+        claimBtn.setAttribute('disabled','');
+    });
 
-    a.forEach((card, i) => {
-      card.addEventListener('click', (e) => {
-        e.preventDefault();
-        checkBtn(i);
-      })
-    })
+    horizScrollEl.addEventListener("scrollsnapchange", (event) => {
+        /* Scrolling stopped, selection set */
+        const currentlySnapped = document.querySelector(".select-section");
+        if (currentlySnapped) {
+            currentlySnapped.classList.remove("select-section");
+        }
+        event.snapTargetInline.classList.add("select-section");
+        claimBtn.removeAttribute('disabled');
+        let challengeId = document.querySelector(".select-section").id;
+        document.getElementById('challengeIdField').value = challengeId;
+    });
+
   </script>
 </body>
 
