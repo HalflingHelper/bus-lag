@@ -1,6 +1,8 @@
 # TODO 🚧
 
-- [] Prettier html
-- [] More feedback / clarity / preventing misclicks
+- [] Prettier html @reece
+- [] More feedback / clarity / preventing misclicks @ reeece
+
 - [] Put in actual challenges
-- [] Syntax for rewards, and a nicer display for them`1
+
+- [] Logging

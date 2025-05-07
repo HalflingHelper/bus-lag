@@ -120,6 +120,12 @@ fastify.get("/logs", async (request, reply) => {
   // Get the log history from the db
   params.optionHistory = await db.getLogs();
 
+  const flop = await db.getFlop();
+  if (flop) {
+    params.flop = flop
+  }
+
+
   // Let the user know if there's an error
   params.error = params.optionHistory ? null : data.errorMessage;
 
@@ -128,6 +134,37 @@ fastify.get("/logs", async (request, reply) => {
     ? reply.send(params)
     : reply.view("/src/pages/admin.hbs", params);
 });
+
+fastify.post("/veto", async (request, reply) => {
+  let params = request.query.raw ? {} : { seo: seo };
+
+  if (
+    !request.body.key ||
+    request.body.key.length < 1 ||
+    !process.env.ADMIN_KEY ||
+    request.body.key !== process.env.ADMIN_KEY
+  ) {
+    console.error("Auth fail");
+
+    // Auth failed, return the log data plus a failed flag
+    params.failed1 = "You entered invalid credentials!";
+
+    // Get the log list
+    params.optionHistory = await db.getLogs();
+  } else {
+    await db.updateFlop(request.body.challenge, -1)
+
+    return reply.redirect("/");
+  }
+
+  // Send a 401 if auth failed, 200 otherwise
+  const status = params.failed1 ? 401 : 200;
+  // Send an unauthorized status code if the user credentials failed
+  return request.query.raw
+    ? reply.status(status).send(params)
+    : reply.status(status).view("/src/pages/admin.hbs", params);
+
+})
 
 
 fastify.post("/shuffle", async (request, reply) => {
@@ -150,7 +187,7 @@ fastify.post("/shuffle", async (request, reply) => {
 
     // Get the log list
     params.optionHistory = await db.getLogs();
-  } 
+  }
   else {
     await db.reshuffleChallenges();
     // db.resetChallenges()
@@ -192,17 +229,10 @@ fastify.post("/reset", async (request, reply) => {
 
     // Get the log list
     params.optionHistory = await db.getLogs();
-  } 
+  }
   else {
     await db.resetChallenges()
   }
-//   else {
-//     // We have a valid key and can clear the log
-//     params.optionHistory = await db.clearHistory();
-
-//     // Check for errors - method would return false value
-//     params.error = params.optionHistory ? null : data.errorMessage;
-//   }
 
   // Send a 401 if auth failed, 200 otherwise
   const status = params.failed ? 401 : 200;

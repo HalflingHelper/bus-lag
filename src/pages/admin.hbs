@@ -59,6 +59,29 @@
       </p>
       {{/if}}
 
+      <form action="/veto" method="post">
+        <h2>Veto</h2>
+        <p>
+          Remove a challenge from the flop
+        </p>
+        <p>
+          Enter your admin key to confirm:
+        </p>
+
+        {{#if failed1}}
+          {{failed1}}
+        {{/if}}
+        <select required="required" name="challenge" id="challenge">
+          {{#each flop}}
+            <option value="{{this.id}}">{{this.title}}</option>
+          {{/each}}
+        </select>
+
+        <input type="password" id="pass2" name="key" required />
+        <button type="submit">Veto</button>
+      </form>
+
+
       <form action="/shuffle" method="post">
         <h2>Reshuffle</h2>
         <p>

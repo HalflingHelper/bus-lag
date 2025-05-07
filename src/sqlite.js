@@ -21,48 +21,48 @@ We're using the sqlite wrapper so that we can make async / await connections
 */
 async function loadInitData(db) {
   await db.run(
-          "CREATE TABLE Challenges (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, reward TEXT, complete INTEGER DEFAULT 0, spent INTEGER DEFAULT 0)"
-        )
+    "CREATE TABLE Challenges (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, reward TEXT, complete INTEGER DEFAULT 0, spent INTEGER DEFAULT 0)"
+  )
 
-        await db.run(
-          `INSERT INTO Challenges (title, description, reward, complete) VALUES
+  await db.run(
+    `INSERT INTO Challenges (title, description, reward, complete) VALUES
             ('Make cheese', 'make some yummy cheese', 'bus', 1),
             ('Throw cheese', 'baseball is fun', 'scooter', 1),
             ('Buy cheese', 'buy some yummy cheese', 'uber', 1),
             ('Eat cheese', 'eat some yummy cheese', 'bus', 1),
             ('Sell cheese', 'Find a pedestrian and sell them cheese', 'bus', 0)
           `
-        )
+  )
 
-        await db.run(
-          "CREATE TABLE Teams (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)"
-        )
+  await db.run(
+    "CREATE TABLE Teams (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)"
+  )
 
-        await db.run(
-          `INSERT INTO Teams (name) VALUES
+  await db.run(
+    `INSERT INTO Teams (name) VALUES
           ('Reece & Calvin'),
           ('Ronak & Matei'),
           ('Flynn & Dane'),
           ('Addie & Mia')`
-        )
+  )
 
 
-        await db.run(
-          "CREATE TABLE TeamTickets (id INTEGER PRIMARY KEY AUTOINCREMENT, team_id INTEGER, challenge_id INTEGER, status INTEGER DEFAULT 0, FOREIGN KEY (team_id) REFERENCES Teams(id), FOREIGN KEY (challenge_id) REFERENCES Challenges(id))"
-        )
+  await db.run(
+    "CREATE TABLE TeamTickets (id INTEGER PRIMARY KEY AUTOINCREMENT, team_id INTEGER, challenge_id INTEGER, old INTEGER DEFAULT 0, FOREIGN KEY (team_id) REFERENCES Teams(id), FOREIGN KEY (challenge_id) REFERENCES Challenges(id))"
+  )
 
-        await db.run(
-          "CREATE TABLE Flop (id INTEGER PRIMARY KEY AUTOINCREMENT, challenge_id INTEGER, FOREIGN KEY (challenge_id) REFERENCES Challenges(id))"
-        )
+  await db.run(
+    "CREATE TABLE Flop (id INTEGER PRIMARY KEY AUTOINCREMENT, challenge_id INTEGER, FOREIGN KEY (challenge_id) REFERENCES Challenges(id))"
+  )
 
-        // Initial Flop
-        await db.run(
-          "INSERT INTO Flop (challenge_id) VALUES (1), (2), (3), (4)"
-        )
+  // Initial Flop
+  await db.run(
+    "INSERT INTO Flop (challenge_id) VALUES (1), (2), (3), (4)"
+  )
 
-        await db.run(
-          "CREATE TABLE Log (id INTEGER PRIMARY KEY AUTOINCREMENT, action TEXT, time STRING)"
-        )
+  await db.run(
+    "CREATE TABLE Log (id INTEGER PRIMARY KEY AUTOINCREMENT, action TEXT, time STRING)"
+  )
 }
 
 
@@ -95,40 +95,58 @@ dbWrapper
 // Our server script will call these methods to connect to the db
 module.exports = {
 
-  reshuffleChallenges : async () => {
+  reshuffleChallenges: async () => {
     console.log("RESHUFFLE");
+
+
+    let blah1 = await (db.all("SELECT * FROM Challenges"))
+    console.log(blah1)
 
     await db.run(
       "UPDATE Challenges SET spent=0, complete=0 WHERE complete=2 AND spent=1"
     )
 
-    let flop_size = await db.run("SELECT COUNT(*) FROM Flop");
+    let blah = await (db.all("SELECT * FROM Challenges"))
+    console.log(blah)
+
+    let flop_size = await db.all("SELECT COUNT(*) FROM Flop");
+
+    flop_size = flop_size[0]['COUNT(*)']
+
+    console.log(flop_size)
 
     if (flop_size < 4) {
-      for (let i = 0; i != 4 - flop)
+      let new_cs = await db.all(`SELECT (id) FROM Challenges WHERE complete=0 ORDER BY RANDOM() LIMIT ?`, 4 - flop_size)
+
+      console.log(new_cs)
+
+      await new_cs.forEach(async (c) => {
+        await db.run(
+          "INSERT INTO Flop (challenge_id) VALUES (?)", c.id
+        )
+
+        await db.run(
+          "UPDATE Challenges SET complete = 1 WHERE id = ?",
+          c.id
+        );
+      })
     }
-
-    // Set all challenges that are complete 2 and spent 1
-    //  to completed 0 and spent 0
-    // Set all challenges that are spent to no spent
-
-    // Remove extraneous completed tickets
   },
 
 
   // TODO: Add logging (trivial)
-  resetChallenges : async () => {
+  resetChallenges: async () => {
     console.log("RESET")
-    
+
     await db.run("DROP TABLE Challenges")
     await db.run("DROP TABLE Teams")
     await db.run("DROP TABLE Flop")
     await db.run("DROP TABLE TeamTickets")
     await db.run("DROP TABLE Log")
-    
+
     await loadInitData(db);
   },
-  
+
   spendChallenge: async (challenge_id) => {
     try {
       await db.run(
@@ -161,7 +179,7 @@ module.exports = {
 
       if (teams && challenges) {
         // I want the team id in both the be the same
-        teams = teams.map(t => { return { "id": t.id, "name": t.name, "challenges": challenges.filter(c => c.team_id == t.id)} })
+        teams = teams.map(t => { return { "id": t.id, "name": t.name, "challenges": challenges.filter(c => c.team_id == t.id) } })
 
         teams.forEach(t => {
           t.remaining = 3 - t.challenges.length
@@ -195,19 +213,26 @@ module.exports = {
 
 
       if (challenge_id && challenge_id.length > 0) {
-        await db.run(
-          "UPDATE Challenges SET complete = 2 WHERE id = ?",
-          challenge_id[0].challenge_id
-        );
 
-        // TODO: Put the challenge somewhere else?
         if (dest > 0) {
+          await db.run(
+            "UPDATE Challenges SET complete = 2 WHERE id = ?",
+            challenge_id[0].challenge_id
+          );
 
+          // TODO: Put the challenge somewhere else?
           await db.run(
             "INSERT INTO TeamTickets (team_id, challenge_id) VALUES (?, ?)",
             dest, challenge_id[0].challenge_id
           )
         }
+        else {
+          await db.run(
+            "UPDATE Challenges SET complete = 2, spent=1 WHERE id = ?",
+            challenge_id[0].challenge_id
+          );
+        }
+
       }
 
 
@@ -239,58 +264,6 @@ module.exports = {
 
   // TODO: Below here is mostly useless
 
-  /**
-   * Get the options in the database
-   *
-   * Return everything in the Choices table
-   * Throw an error in case of db connection issues
-   */
-  getOptions: async () => {
-    // We use a try catch block in case of db errors
-    try {
-      return await db.all("SELECT * from Choices");
-    } catch (dbError) {
-      // Database connection error
-      console.error(dbError);
-    }
-  },
-
-  /**
-   * Process a user vote
-   *
-   * Receive the user vote string from server
-   * Add a log entry
-   * Find and update the chosen option
-   * Return the updated list of votes
-   */
-  processVote: async vote => {
-    // Insert new Log table entry indicating the user choice and timestamp
-    try {
-      // Check the vote is valid
-      const option = await db.all(
-        "SELECT * from Choices WHERE language = ?",
-        vote
-      );
-      if (option.length > 0) {
-        // Build the user data from the front-end and the current time into the sql query
-        await db.run("INSERT INTO Log (choice, time) VALUES (?, ?)", [
-          vote,
-          new Date().toISOString()
-        ]);
-
-        // Update the number of times the choice has been picked by adding one to it
-        await db.run(
-          "UPDATE Choices SET picks = picks + 1 WHERE language = ?",
-          vote
-        );
-      }
-
-      // Return the choices so far - page will build these into a chart
-      return await db.all("SELECT * from Choices");
-    } catch (dbError) {
-      console.error(dbError);
-    }
-  },
 
   /**
    * Get logs
@@ -306,25 +279,4 @@ module.exports = {
       console.error(dbError);
     }
   },
-
-  /**
-   * Clear logs and reset votes
-   *
-   * Destroy everything in Log table
-   * Reset votes in Choices table to zero
-   */
-  clearHistory: async () => {
-    try {
-      // Delete the logs
-      await db.run("DELETE from Log");
-
-      // Reset the vote numbers
-      await db.run("UPDATE Choices SET picks = 0");
-
-      // Return empty array
-      return [];
-    } catch (dbError) {
-      console.error(dbError);
-    }
-  }
 };
