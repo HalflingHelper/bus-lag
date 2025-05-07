@@ -25,12 +25,37 @@ async function loadInitData(db) {
   )
 
   await db.run(
-    `INSERT INTO Challenges (title, description, reward, complete) VALUES
-            ('Make cheese', 'make some yummy cheese', 'bus', 1),
-            ('Throw cheese', 'baseball is fun', 'scooter', 1),
-            ('Buy cheese', 'buy some yummy cheese', 'uber', 1),
-            ('Eat cheese', 'eat some yummy cheese', 'bus', 1),
-            ('Sell cheese', 'Find a pedestrian and sell them cheese', 'bus', 0)
+    `INSERT INTO Challenges (title, reward, description, complete) VALUES
+           ('Read aloud an entire picture book at a library.', 'Take a scooter 10 minutes to the east.', 'Narrate an entire picture book out loud.', 0),
+           ('Play the alphabet game', 'Take a scooter 5 minutes to the north.', 'Find every letter of the alphabet in order. Letters must be outside and on signage.', 0),
+           ('Find 5 countries at a museum', 'Take a scooter 10 minutes.', 'Go to a museum and find exhibits that reference 5 different countries.', 0),
+           ('Find a former University president ', 'Ride the bus 5 minutes to the north.', 'Find a sculpture. portrait, or landmark named for a former IU president and take a selfie with it.', 0),
+           ('Earn a dollar busking', 'Take an uber 2 miles.', 'You may not ask for the dollar directly in conversation, but you can ask through singing, dancing, miming, signage, or any similar form.', 0),
+           ('Solve a puzzle in a physical issue of the IDS', 'Ride the bus 15 minutes.', 'You must find a physical IDS newspaper and complete either the crossword or the sudoku; you cannot use the internet.', 0),
+           ('Find a Statue and Recreate It', 'Take a scooter 5 minutes.', 'You must hold the pose for at least a minute. You cannot use the internet to locate the statue.', 0),
+           ('Show your Pride', 'Ride the bus 15 minutes.', 'Take selfies with 3 publicly displayed pride flags!', 1),
+           ('Two Tea Times', 'Ride the bus 15 minutes.', 'Order 2 different types of tea from 2 different restaurants or cafés (i.e. 2 teas in total)', 0),
+           ('Bark Break', 'Ride the bus 15 minutes.', 'Pet 3 dogs', 0),
+           ('Advocate for a Clean Bloomington', 'Take a scooter 5 minutes to the west.', 'Throw away 10 items of litter and advocate proper recycling practice to 10 people', 0),
+           ('Transport water', 'Take an uber 2.5 miles.', 'Must bring at least a cup of water from one body of water to another. The bodies may be man-made, but must be wadeable', 0),
+           ('Piggyback Ride', 'Take an uber 1.5 miles.', 'You must give your teammate a piggyback ride around the entire perimeter of a local park. You may switch off at any point. A park is any area on the map with "park" in the title.', 0),
+           ('Karaoke Dokie', 'Ride the bus 20 minutes.', 'Have a stranger sing a song with you for at least 30 seconds', 0),
+           ('Split, split, split!', 'Ride the bus 20 minutes to the east.', 'Share a banana split with your teammate while discussing fun facts about Split, Croatia. mmmmmm yummy!', 0),
+           ('Hit Core', 'Ride the bus 15 minutes.', 'Your team must complete 100 burpees. You and your partner can switch off, but cannot do them concurrently.', 0),
+           ('Copycat catwalk', 'Ride the bus 30 minutes.', 'Recreate your team member&rsquo;s outfit without using any clothing items directly on your teammate. The outfit must consist of real clothes.', 0),
+           ('Squirrel Snack Supply', 'Take a scooter 10 minutes', 'Pick out a food item that you think a squirrel would like. You must then offer it to a squirrel, and the squirrel should eat the item within 15 seconds. Otherwise you must find a different squirrel.', 1),
+           ('Find your Other Half', 'Take an uber 2 miles.', 'Using a ring or ring-alternative, propose to a stranger in public and have them say, &ldquo;yes.&rdquo;', 0),
+           ('Modern Architecture', 'Ride the bus 20 minutes.', 'Use french fries to construct a freestanding structure at least 6 inches tall. The structure must support its own weight for 10 seconds for the challenge to be completed.', 0),
+           ('Rainbow Collection', 'Take a scooter 10 minutes.', 'Find 6 plants, one displaying each of the 6 colors of the rainbow. (Red, Orange, Yellow, Green, Blue, Purple)', 0),
+           ('Swingin&rsquo; Party', 'Take an uber 2 miles south.', 'Spend 5 minutes swinging on a swing set.', 1),
+           ('Worm', 'Ride the bus 10 minutes.', 'Pet a worm.', 0),
+           ('Pictionary with strangers', 'Take a scooter 15 minutes.', 'Get three strangers to say the words jet lag, frisbee, and newspaper based only of a drawing. A different stranger must guess each of the words. If you speak to the stranger, they are disqualified from guessing any of the words. The drawing cannot contain letters.', 0),
+           ('What&rsquo;s in your jeep?', 'Take an uber 1.5 miles west.', 'As a team, perform the first verse of The Lonely Island&rsquo;s "Things in my jeep." You can look up the lyrics and memorize for as long as you need, but when you perform you cannot use any lyric assistance. Check afterwards, and if you made any mistakes, you can retry after a 2 minute cooldown.', 0),
+           ('Skip stones', 'Ride the bus 15 minutes.', 'Skip a stone for at least 3 bounces.', 1),
+           ('William tell', 'Ride the bus 15 minutes.', 'Use any object to knock an apple off your teammates head from at least 15 ft away.', 0),
+           ('McMeal', 'Ride the bus 15 minutes.', 'Eat something with the letters "Mc"  in its name. The letters must be next to each other (No Mac and Cheese, sorry!)', 0),
+           ('Geoguessr', 'Ride the bus 15 minutes.', 'Find and place yourself in one of these photos! You may not use google maps or street view to assist your search.', 0),
+           ('Taste test', 'Take a scooter 5 minutes south.', 'Obtain gummy bears, worms, or jelly beans. Have a blindfolded team member guess 3 correct flavors or colors in a row. If you fail, you must wait a 3 minute cooldown before trying again. You may practice, but must declare an official attempt.', 0)
           `
   )
 

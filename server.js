@@ -90,6 +90,7 @@ fastify.post("/complete", async (request, reply) => {
 
   // Remove the selected challenge from the flop
   // TODO: To where?
+  // console.log(request.body.challenge, request.body.team)
 
   if (request.body.challenge) {
     // The index is the index in the flop?

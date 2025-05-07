@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
   <meta charset="utf-8" />
@@ -20,134 +21,138 @@
   <meta name="theme-color" content="#183B4E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=ADLaM+Display&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=ADLaM+Display&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet">
   <!-- Import the webpage's stylesheet -->
   <link rel="stylesheet" href="/style.css" />
 </head>
 
 <body>
 
-      {{#if error}}
-      <p class="error">
-        {{error}}
-      </p>
-      {{else}}
+  {{#if error}}
+  <p class="error">
+    {{error}}
+  </p>
+  {{else}}
 
-      <!-- Challenges -->
-      <div class="h-scroll">
+  <!-- Challenges -->
+  <div class="h-scroll">
 
-        {{#each flop}}
+    {{#each flop}}
 
-        <div class="chal-card" id="{{this.id}}">
-          <h2 class="header">{{this.title}}</h2>
-          <p class="body">{{this.description}}</p>
-          <div class="reward v-ticket-divet">
-            <h3 class="pill">
-              Ticket
-            </h3>
-            <p>{{this.reward}}</p>
+    <div class="chal-card" id="{{this.id}}">
+      <h2 class="header">{{this.title}}</h2>
+      <p class="body">{{this.description}}</p>
+      <div class="reward v-ticket-divet">
+        <h3 class="pill">
+          Ticket
+        </h3>
+        <p>{{this.reward}}</p>
+      </div>
+    </div>
+    {{/each}}
+
+
+    {{!-- <div class="chal-card">
+      <h2 class="header">Read aloud an entire picture book at a library.</h2>
+      <p class="body">Draw pictures of jet lag, a frisbee, a newspaper. For each image have a different stranger
+        guess what you drew (1 stranger per image). You may not talk to the stranger at all. You may not use
+        your phone.</p>
+      <div class="reward v-ticket-divet">
+        <h3 class="pill">
+          Ticket
+        </h3>
+        <p>1 mile Uber in the west direction some extra words for longer ones i guess....</p>
+      </div>
+    </div> --}}
+  </div>
+
+  <!-- Claim Sheet -->
+
+  <div class="popover-sheet" id="claim-sheet" popover>
+    <div class="popover-header">
+      <h1>Select Team</h1>
+      <button class="close-button" popovertarget="claim-sheet" popovertargetaction="claim">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">
+          <path d="M11 1.5L1 11.5M1 1.5L11 11.5" stroke="#D9D9D9" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+    </div>
+    <form method="post" action="complete" onsubmit="return confirm('Are you sure you're able to claim this ticket?');">
+      <div class="popover-content">
+        {{!-- This hidden field will store the challengeId whenever a card is changed --}}
+        <input id="challengeIdField" name="challenge" type="hidden" value="">
+        <input id="challengeTeamClaimField" name="team" type="hidden" value="">
+
+        {{#each teams}}
+        {{!-- in the POST, you should see the name of the button that submitted the form, which is also the teamId --}}
+        <button id="{{this.id}}" name="{{this.id}}" class="btn btn-accent btn-full"
+          onclick="{ console.log('Click'); document.getElementById('challengeTeamClaimField').value={{this.id}}; }">
+          <div class="avatar-container">
+            {{!-- <img src="https://avatars.githubusercontent.com/u/60663079?v=4" alt="Calvin Smiles"> --}}
+            <p>{{this.name}}</p>
+            {{!-- <img src="https://avatars.githubusercontent.com/u/83771014?v=4" alt="Reece Smailes"> --}}
           </div>
-        </div>
+        </button>
         {{/each}}
+      </div>
+    </form>
+  </div>
 
 
-        <div class="chal-card">
-          <h2 class="header">Read aloud an entire picture book at a library.</h2>
-          <p class="body">Draw pictures of jet lag, a frisbee, a newspaper. For each image have a different stranger
-            guess what you drew (1 stranger per image). You may not talk to the stranger at all. You may not use
-            your phone.</p>
-          <div class="reward v-ticket-divet">
-            <h3 class="pill">
-              Ticket
-            </h3>
-            <p>1 mile Uber in the west direction some extra words for longer ones i guess....</p>
+  <!-- Use Ticket Sheet -->
+  <div class="popover-sheet" id="ticket-sheet" popover>
+    <div class="popover-header">
+      <h1>Tickets</h1>
+      <button class="close-button" popovertarget="ticket-sheet" popovertargetaction="hide">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">
+          <path d="M11 1.5L1 11.5M1 1.5L11 11.5" stroke="#D9D9D9" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="popover-content">
+      {{#each teams}}
+      <div class="btn btn-accent btn-full">
+        <h2>{{this.name}}</h2>
+      </div>
+
+      {{#each this.challenges}}
+      <form method="post" action="spend?v={{this.id}}"
+        onsubmit="return confirm('Are you sure you want to use this ticket?');">
+
+        {{!-- Not really sure what spend() is, but I kept it just in case you need it --}}
+        <button class="ticket-use v-ticket-divet">
+          <p>{{this.reward}}</p>
+          <div class="pill">
+            Use
           </div>
-        </div>
+      </form>
+      </button>
+      {{/each}}
+
+      {{#repeat this.remaining}}
+      <div class="ticket-empty">
+        <p>Empty Slot</p>
       </div>
-
-      <!-- Claim Sheet -->
-
-      <div class="popover-sheet" id="claim-sheet" popover>
-        <div class="popover-header">
-          <h1>Select Team</h1>
-          <button class="close-button" popovertarget="claim-sheet" popovertargetaction="claim">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">
-              <path d="M11 1.5L1 11.5M1 1.5L11 11.5" stroke="#D9D9D9" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
-          </button>
-        </div>
-        <div class="popover-content">
-          <form method="post" action="complete" onsubmit="return confirm('Do you really want to submit the form?');">
-            {{!-- This hidden field will store the challengeId whenever a card is changed --}}
-            <input id="challengeIdField" name="challengeId" type="hidden" value="">
-
-            {{#each teams}}
-            {{!-- in the POST, you should see the name of the button that submitted the form, which is also the teamId --}}
-            <button id="{{this.id}}" name="{{this.id}}" class="btn btn-accent btn-full">
-              <div class="avatar-container">
-                <img src="https://avatars.githubusercontent.com/u/60663079?v=4" alt="Calvin Smiles">
-                <p>{{this.name}}</p>
-                <img src="https://avatars.githubusercontent.com/u/83771014?v=4" alt="Reece Smailes">
-              </div>
-            </button>
-            {{/each}}
-          </form>
-        </div>
-      </div>
+      {{/repeat}}
 
 
-      <!-- Use Ticket Sheet -->
-      <div class="popover-sheet" id="ticket-sheet" popover>
-        <div class="popover-header">
-          <h1>Tickets</h1>
-          <button class="close-button" popovertarget="ticket-sheet" popovertargetaction="hide">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">
-              <path d="M11 1.5L1 11.5M1 1.5L11 11.5" stroke="#D9D9D9" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
-          </button>
-        </div>
+      {{/each}}
 
-        <div class="popover-content">
-          {{#each teams}}
-          <div class="btn btn-accent btn-full">
-            <h2>{{this.name}}</h2>
-          </div>
-
-          {{#each this.challenges}}
-          <form method="post" action="spend?v={{this.id}}"
-            onsubmit="return confirm('Are you sure you want to use this ticket?');">
-
-          {{!-- Not really sure what spend() is, but I kept it just in case you need it --}}
-            <button class="ticket-use v-ticket-divet" onclick="spend()">
-              <p>{{this.reward}}</p>
-              <div class="pill">
-                Use
-              </div>
-          </form>
-          </button>
-          {{/each}}
-
-          {{#repeat this.remaining}}
-            <div class="ticket-empty">
-                <p>Empty Slot</p>
-            </div>
-          {{/repeat}}
+    </div>
+  </div>
 
 
-          {{/each}}
-
-        </div>
-      </div>
-
-
-      <!-- Bottom button actions -->
-      <button id="claim-btn" class="btn btn-accent btn-full" popovertarget="claim-sheet">Claim!</button>
-      <button class="btn btn-secondary btn-full" popovertarget="ticket-sheet">Use Tickets</button>
+  <!-- Bottom button actions -->
+  <button id="claim-btn" class="btn btn-accent btn-full" popovertarget="claim-sheet">Claim!</button>
+  <button class="btn btn-secondary btn-full" popovertarget="ticket-sheet">Use Tickets</button>
 
 
-      {{/if}}
+  {{/if}}
 
 
   <script>
@@ -157,25 +162,26 @@
     const claimBtn = document.getElementById('claim-btn');
 
     horizScrollEl.addEventListener("scrollsnapchanging", (event) => {
-        /* Actively scrolling, selection changing */
-        const previousPending = document.querySelector(".pending");
-        if (previousPending) {
-            previousPending.classList.remove("pending");
-        }
-        event.snapTargetInline.classList.add("pending");
-        claimBtn.setAttribute('disabled','');
+      /* Actively scrolling, selection changing */
+      const previousPending = document.querySelector(".pending");
+      if (previousPending) {
+        previousPending.classList.remove("pending");
+      }
+      event.snapTargetInline.classList.add("pending");
+      claimBtn.setAttribute('disabled', '');
     });
 
     horizScrollEl.addEventListener("scrollsnapchange", (event) => {
-        /* Scrolling stopped, selection set */
-        const currentlySnapped = document.querySelector(".select-section");
-        if (currentlySnapped) {
-            currentlySnapped.classList.remove("select-section");
-        }
-        event.snapTargetInline.classList.add("select-section");
-        claimBtn.removeAttribute('disabled');
-        let challengeId = document.querySelector(".select-section").id;
-        document.getElementById('challengeIdField').value = challengeId;
+      /* Scrolling stopped, selection set */
+      const currentlySnapped = document.querySelector(".select-section");
+      if (currentlySnapped) {
+        currentlySnapped.classList.remove("select-section");
+      }
+      event.snapTargetInline.classList.add("select-section");
+      claimBtn.removeAttribute('disabled');
+      let challengeId = document.querySelector(".select-section").id;
+      console.log("Change challenge")
+      document.getElementById('challengeIdField').value = challengeId;
     });
 
   </script>

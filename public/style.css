@@ -229,6 +229,7 @@ h4 {
 }
 
 .chal-card {
+  position: relative;
   display: flex;
   padding: 1.25rem;
   width: 85vw;
@@ -328,11 +329,12 @@ h1 {
   width: 20px;
   height: 20px;
   background-color: var(--Light);
-  position: relative;
-  top: 0;
-  left: -53.5%;
+  position: absolute;
+  /* top: 0; */
+  /* left: -53.5%; */
+  left: 10px;
   border-radius: 50%;
-  margin-bottom: -20px;
+  /* margin-bottom: -20px; */
 }
 
 .v-ticket-divet:after {
@@ -340,11 +342,12 @@ h1 {
   width: 20px;
   height: 20px;
   background-color: var(--Light);
-  position: relative;
-  top: 0;
-  right: -53.5%;
+  position: absolute;
+  /* top: 0; */
+  right: 10px;
   border-radius: 50%;
-  margin-top: -20px;
+  bottom: 35px;
+  /* margin-top: -20px; */
 }
 
 [popover]::backdrop {
@@ -354,8 +357,9 @@ h1 {
 .popover-sheet {
   position: fixed;
   bottom: 0;
+  /* top: 0; */
   left: 0;
-  width: 100%;
+  width: 95%;
   height: calc(100svh - 30px);
   margin-top: 30px;
   padding: 20px;
@@ -461,6 +465,7 @@ h1 {
   gap: 20px;
   overflow-y: scroll;
   height: calc(100% - 60px);
+  padding: 0 10px;
 }
 
 .avatar-container {
@@ -476,9 +481,11 @@ h1 {
 }
 
 .ticket-use {
+  width: 100%;
   display: flex;
   padding: 0.625rem 1.25rem;
   justify-content: center;
+  gap: 10px;
   align-items: center;
   align-self: stretch;
   border-radius: 0.625rem;
@@ -491,18 +498,30 @@ h1 {
     color: var(--Light);
   }
 
-  &.v-ticket-divet:before {
-    top: 53%;
-    left: -2%;
-    margin-bottom: -20px;
-    aspect-ratio: 1;
+  &.v-ticket-divet {
+    position: relative;
   }
+
+  &.v-ticket-divet:before {
+    /* top: 53%; */
+    /* left: -33%; */
+    /* margin-bottom: 10px; */
+    aspect-ratio: 1;
+    margin: 0px;
+    position: absolute;
+    top: unset;
+    left: -10px;
+}
   
   &.v-ticket-divet:after {
-    top: -65%;
-    right: 95%;
-    margin-bottom: -20px;
+    /* top: -65%; */
+    right: -10px;
+    position: absolute;
+    bottom: unset;
+    top: unset;
+    /* margin-top: 10px; */
     aspect-ratio: 1;
+    margin: 0px;
   }
   
 }
