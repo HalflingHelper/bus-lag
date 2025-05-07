@@ -92,6 +92,13 @@ dbWrapper
   });
 
 
+async function dbLog(msg) {
+  await db.run("INSERT INTO Log (action, time) VALUES (?, ?)", [
+    msg,
+    new Date().toISOString()
+  ]);
+}
+
 // Our server script will call these methods to connect to the db
 module.exports = {
 
@@ -131,6 +138,8 @@ module.exports = {
         );
       })
     }
+
+    dbLog("Reshuffle");
   },
 
 
@@ -149,6 +158,14 @@ module.exports = {
 
   spendChallenge: async (challenge_id) => {
     try {
+
+      let res = await db.all(`SELECT Teams.name, Challenges.reward FROM 
+        TeamTickets INNER JOIN Challenges on TeamTickets.challenge_id = Challenges.id
+        INNER JOIN Teams on Teams.id = TeamTickets.team_id
+        WHERE TeamTickets.challenge_id = ? AND TeamTickets.old = 0
+        `, challenge_id)
+
+
       await db.run(
         "UPDATE Challenges SET spent=1 WHERE id = ?",
         challenge_id
@@ -158,6 +175,12 @@ module.exports = {
         "UPDATE TeamTickets SET old=1 WHERE challenge_id=?",
         challenge_id
       )
+
+      if (res) {
+        dbLog(`${res[0].name} spent ${res[0].reward}`);
+      } else {
+        dbLog("Someone spent something")
+      }
     } catch (dbError) {
       console.error(dbError);
     }
@@ -205,35 +228,46 @@ module.exports = {
     try {
       let challenge_id = await db.all(`SELECT (challenge_id) FROM Flop WHERE id=${flop_id}`)
 
+      if (!(challenge_id && challenge_id.length > 0)) {
+        console.error("Unable to find challenge with correct id")
+      }
       // console.log(challenge_id)
+
+      // Team is where Id matches dest
+      let challenge_name = await db.all(`SELECT title FROM Challenges WHERE id=?`, challenge_id[0].challenge_id)
 
       await db.run(
         `DELETE FROM Flop WHERE id=${flop_id}`
       )
 
+      if (dest > 0) {
+        await db.run(
+          "UPDATE Challenges SET complete = 2 WHERE id = ?",
+          challenge_id[0].challenge_id
+        );
 
-      if (challenge_id && challenge_id.length > 0) {
+        // TODO: Put the challenge somewhere else?
+        await db.run(
+          "INSERT INTO TeamTickets (team_id, challenge_id) VALUES (?, ?)",
+          dest, challenge_id[0].challenge_id
+        )
 
-        if (dest > 0) {
-          await db.run(
-            "UPDATE Challenges SET complete = 2 WHERE id = ?",
-            challenge_id[0].challenge_id
-          );
 
-          // TODO: Put the challenge somewhere else?
-          await db.run(
-            "INSERT INTO TeamTickets (team_id, challenge_id) VALUES (?, ?)",
-            dest, challenge_id[0].challenge_id
-          )
-        }
-        else {
-          await db.run(
-            "UPDATE Challenges SET complete = 2, spent=1 WHERE id = ?",
-            challenge_id[0].challenge_id
-          );
-        }
+        let team_name = await db.all(
+          "SELECT name FROM Teams where id = ?", dest
+        )
 
+        dbLog(`${team_name[0].name} completed ${challenge_name[0].title}`)
       }
+      else {
+        await db.run(
+          "UPDATE Challenges SET complete = 2, spent=1 WHERE id = ?",
+          challenge_id[0].challenge_id
+        );
+
+        dbLog(`${challenge_name[0].title} was vetoed`)
+      }
+
 
 
       // Mark the challenge as gone
