@@ -231,6 +231,7 @@ module.exports = {
 
         teams.forEach(t => {
           t.remaining = 3 - t.challenges.length
+          t.canComplete = t.challenges.length < 3
         });
       }
 

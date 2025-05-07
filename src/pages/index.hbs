@@ -88,6 +88,8 @@
 
         {{#each teams}}
         {{!-- in the POST, you should see the name of the button that submitted the form, which is also the teamId --}}
+        {{!-- TODO: Disable the button if the team has too many challenges --}}
+        {{#if this.canComplete}}
         <button id="{{this.id}}" name="{{this.id}}" class="btn btn-accent btn-full"
           onclick="{ console.log('Click'); document.getElementById('challengeTeamClaimField').value={{this.id}}; }">
           <div class="avatar-container">
@@ -96,6 +98,16 @@
             {{!-- <img src="https://avatars.githubusercontent.com/u/83771014?v=4" alt="Reece Smailes"> --}}
           </div>
         </button>
+        {{else}}
+        <button disabled id="{{this.id}}" name="{{this.id}}" class="btn btn-accent btn-full"
+          onclick="{ console.log('Click'); document.getElementById('challengeTeamClaimField').value={{this.id}}; }">
+          <div class="avatar-container">
+            {{!-- <img src="https://avatars.githubusercontent.com/u/60663079?v=4" alt="Calvin Smiles"> --}}
+            <p>{{this.name}} - Cannot hold more than 3 tickets</p>
+            {{!-- <img src="https://avatars.githubusercontent.com/u/83771014?v=4" alt="Reece Smailes"> --}}
+          </div>
+        </button>
+        {{/if}}
         {{/each}}
       </div>
     </form>
